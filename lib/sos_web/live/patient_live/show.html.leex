@@ -1,0 +1,27 @@
+<h1>Show Patient</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, SosWeb.PatientLive.FormComponent,
+    id: @patient.id,
+    title: @page_title,
+    action: @live_action,
+    patient: @patient,
+    return_to: Routes.patient_show_path(@socket, :show, @patient) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>First name:</strong>
+    <%= @patient.first_name %>
+  </li>
+
+  <li>
+    <strong>Last name:</strong>
+    <%= @patient.last_name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.patient_show_path(@socket, :edit, @patient), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.patient_index_path(@socket, :index) %></span>

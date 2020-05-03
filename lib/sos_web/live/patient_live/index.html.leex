@@ -1,0 +1,28 @@
+<h1>Patients</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, SosWeb.PatientLive.FormComponent,
+    id: @patient.id || :new,
+    title: @page_title,
+    action: @live_action,
+    patient: @patient,
+    return_to: Routes.patient_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>First name</th>
+      <th>Last name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="patients">
+    <%= for patient <- @patients do %>
+      <%= live_component @socket, SosWeb.PatientLive.PatientComponent, id: patient.id, patient: patient %>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Patient", to: Routes.patient_index_path(@socket, :new) %></span>
