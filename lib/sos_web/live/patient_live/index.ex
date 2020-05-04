@@ -39,7 +39,7 @@ defmodule SosWeb.PatientLive.Index do
     patient = CommandCenter.get_patient!(id)
     {:ok, _} = CommandCenter.delete_patient(patient)
 
-    {:noreply, assign(socket, :patients, fetch_patients())}
+    {:noreply, socket}
   end
 
   def handle_info({:patient_created, patient}, socket) do
@@ -50,7 +50,29 @@ defmodule SosWeb.PatientLive.Index do
     {:noreply, update(socket, :patients, fn patients -> [patient | patients] end)}
   end
 
+  def handle_info({:patient_deleted, patient}, socket) do
+    {:noreply, update(socket, :patients, fn patients -> patients |> remove_patient(patient) end)}
+  end
+
   defp fetch_patients do
     CommandCenter.list_patients()
+  end
+
+  defp refresh_patients(patients, patient) do
+    patients
+    |> Enum.map(fn p -> maybe_replace_patient(p, patient) end)
+  end
+
+  def maybe_replace_patient(original_patient, new_patient) do
+    if original_patient.id == new_patient.id do
+      new_patient
+    else
+      original_patient
+    end
+  end
+
+  defp remove_patient(patients, patient) do
+    patients
+    |> Enum.filter(fn p -> p.id != patient.id end)
   end
 end

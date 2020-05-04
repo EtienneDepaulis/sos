@@ -8,6 +8,11 @@ defmodule Sos.CommandCenter do
 
   alias Sos.CommandCenter.Patient
 
+  def all_patients do
+    Patient
+    |> order_by([p], [asc: p.last_name])
+  end
+
   @doc """
   Returns the list of patients.
 
@@ -18,7 +23,8 @@ defmodule Sos.CommandCenter do
 
   """
   def list_patients do
-    Repo.all(Patient)
+    all_patients
+    |> Repo.all
   end
 
   @doc """
@@ -88,7 +94,9 @@ defmodule Sos.CommandCenter do
 
   """
   def delete_patient(%Patient{} = patient) do
-    Repo.delete(patient)
+    patient
+    |> Repo.delete
+    |> broadcast(:patient_deleted)
   end
 
   @doc """

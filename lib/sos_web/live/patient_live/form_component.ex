@@ -42,7 +42,7 @@ defmodule SosWeb.PatientLive.FormComponent do
 
   defp save_patient(socket, :new, patient_params) do
     case CommandCenter.create_patient(patient_params) do
-      {:ok, _patient} ->
+      {:ok, patient} ->
         {:noreply,
          socket
          |> put_flash(:info, "Patient created successfully")
