@@ -9,6 +9,10 @@
     return_to: Routes.patient_index_path(@socket, :index) %>
 <% end %>
 
+<form phx-change="filter">
+  <input type="text" name="query" value="<%= @query %>" placeholder="First name or Last name" list="results" autocomplete="off"/>
+</form>
+
 <table>
   <thead>
     <tr>
@@ -20,7 +24,7 @@
   </thead>
   <tbody id="patients">
     <%= for patient <- @patients do %>
-      <%= live_component @socket, SosWeb.PatientLive.PatientComponent, id: patient.id, patient: patient %>
+      <%= live_component @socket, SosWeb.PatientLive.PatientComponent, id: patient.id, patient: patient, new_patient_ids: @new_patient_ids %>
     <% end %>
   </tbody>
 </table>

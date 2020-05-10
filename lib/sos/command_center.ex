@@ -23,7 +23,13 @@ defmodule Sos.CommandCenter do
 
   """
   def list_patients do
-    all_patients
+    all_patients()
+    |> Repo.all
+  end
+
+  def list_patients(query) do
+    all_patients()
+    |> where([p], ilike(p.first_name, ^"%#{query}%") or ilike(p.last_name, ^"%#{query}%"))
     |> Repo.all
   end
 

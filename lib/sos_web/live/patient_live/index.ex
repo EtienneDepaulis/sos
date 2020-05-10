@@ -8,7 +8,7 @@ defmodule SosWeb.PatientLive.Index do
   def mount(_params, _session, socket) do
     if connected?(socket), do: CommandCenter.subscribe()
 
-    {:ok, assign(socket, :patients, fetch_patients())}
+    {:ok, assign(socket, patients: CommandCenter.list_patients(), query: "", loading: false, new_patient_ids: [])}
   end
 
   @impl true
@@ -42,32 +42,47 @@ defmodule SosWeb.PatientLive.Index do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event("filter", %{"query" => query}, socket) do
+    send(self(), {:run_filter, query})
+
+    socket =
+      assign(socket,
+        query: query,
+        loading: true
+      )
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:patient_created, patient}, socket) do
-    {:noreply, update(socket, :patients, fn patients -> [patient | patients] end)}
+    {:noreply, assign(socket, patients: CommandCenter.list_patients(socket.assigns.query), new_patient_ids: [patient.id])}
   end
 
+  @impl true
   def handle_info({:patient_updated, patient}, socket) do
-    {:noreply, update(socket, :patients, fn patients -> [patient | patients] end)}
+    {:noreply, assign(socket, patients: CommandCenter.list_patients(socket.assigns.query), new_patient_ids: [patient.id])}
   end
 
+  @impl true
   def handle_info({:patient_deleted, patient}, socket) do
     {:noreply, update(socket, :patients, fn patients -> patients |> remove_patient(patient) end)}
   end
 
-  defp fetch_patients do
-    CommandCenter.list_patients()
-  end
+  @impl true
+  def handle_info({:run_filter, query}, socket) do
+    case CommandCenter.list_patients(query) do
+      [] ->
+        socket =
+          socket
+          |> assign(patients: [], loading: false)
 
-  defp refresh_patients(patients, patient) do
-    patients
-    |> Enum.map(fn p -> maybe_replace_patient(p, patient) end)
-  end
+        {:noreply, socket}
 
-  def maybe_replace_patient(original_patient, new_patient) do
-    if original_patient.id == new_patient.id do
-      new_patient
-    else
-      original_patient
+      patients ->
+        socket = assign(socket, patients: patients, loading: false)
+        {:noreply, socket}
     end
   end
 

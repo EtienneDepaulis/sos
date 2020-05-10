@@ -3,7 +3,7 @@ defmodule SosWeb.PatientLive.PatientComponent do
 
   def render(assigns) do
     ~L"""
-      <tr id="patient-<%= @patient.id %>">
+      <tr class="<%= if new_item?(@new_patient_ids, @patient.id) do "new-item" end %>" id="patient-<%= @patient.id %>">
         <td><%= @patient.first_name %></td>
         <td><%= @patient.last_name %></td>
 
@@ -15,4 +15,9 @@ defmodule SosWeb.PatientLive.PatientComponent do
       </tr>
     """
   end
+
+  defp new_item?(ids, id) do
+    Enum.count(ids, fn x -> x == id end) > 0
+  end
+
 end
