@@ -10,23 +10,27 @@
 <% end %>
 
 <form phx-change="filter">
-  <input type="text" name="query" value="<%= @query %>" placeholder="First name or Last name" list="results" autocomplete="off"/>
+  <input class="form-input block w-full pl-7 pr-12 sm:text-sm sm:leading-5" type="text" name="query" value="<%= @query %>" placeholder="First name or Last name" list="results" autocomplete="off"/>
 </form>
-
-<table>
-  <thead>
-    <tr>
-      <th>First name</th>
-      <th>Last name</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="patients">
-    <%= for patient <- @patients do %>
-      <%= live_component @socket, SosWeb.PatientLive.PatientComponent, id: patient.id, patient: patient, new_patient_ids: @new_patient_ids %>
-    <% end %>
-  </tbody>
-</table>
+<div class="flex flex-col">
+  <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+    <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+      <table class="min-w-full">
+        <thead>
+          <tr>
+            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">First name</th>
+            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Last name</th>
+            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
+          </tr>
+        </thead>
+        <tbody id="patients" class="bg-white>
+          <%= for patient <- @patients do %>
+            <%= live_component @socket, SosWeb.PatientLive.PatientComponent, id: patient.id, patient: patient, new_patient_ids: @new_patient_ids %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <span><%= live_patch "New Patient", to: Routes.patient_index_path(@socket, :new) %></span>
